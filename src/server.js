@@ -5,8 +5,11 @@ import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 
-dotenv.config();
+import { connectDb } from "./config/db.config.js";
 
+dotenv.config();
+// Call Connection DB
+connectDb();
 const app = express();
 
 // Middlewars
