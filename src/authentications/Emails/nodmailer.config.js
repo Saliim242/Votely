@@ -1,4 +1,4 @@
-import nodmailer from "nodmailer";
+import nodmailer from "nodemailer";
 import dotenv from "dotenv";
 
 // Config the The Environment Variables

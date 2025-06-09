@@ -1,27 +1,48 @@
 import express from "express";
+import {
+  getAllUsers,
+  getUser,
+  updateUser,
+  deleteUser,
+  updateProfileImage,
+  getMe,
+} from "./user.controller.js";
+import { protect, admin } from "../middlewares/auth.middleware.js";
+import { isOwnerOrAdmin } from "../middlewares/roles.check.middleware.js";
 
 const route = express.Router();
 
-//Get All Users
+// GET /api/users - Get all users
+route.get("/", protect, admin, getAllUsers);
 
-route.get("/", getAllUsers);
+// GET /api/users/me - Get current logged in user
+route.get("/me", protect, getMe);
 
-//Get Single User
+// GET /api/users/:id - Get single user
+route.get(
+  "/:id",
+  protect,
+  isOwnerOrAdmin((req) => req.params.id),
+  getUser
+);
 
-route.get("/:id", getSingleUser);
+// PUT /api/users/:id - Update a user
+route.put(
+  "/:id",
+  protect,
+  isOwnerOrAdmin((req) => req.params.id),
+  updateUser
+);
 
-//Create User
+// PUT /api/users/:id/profile-image - Update a user's profile image
+route.put(
+  "/:id/profile-image",
+  protect,
+  isOwnerOrAdmin((req) => req.params.id),
+  updateProfileImage
+);
 
-route.post("/create", createUser);
+// DELETE /api/users/:id - Delete a user
+route.delete("/:id", protect, admin, deleteUser);
 
-// Update User
-
-route.patch("/user/:id", updateUser);
-
-//Update User Profile Image
-
-route.put("/profile-image", updateUserProfileImage);
-
-//Delete User
-
-route.delete("/:id", deleteUser);
+export default route;

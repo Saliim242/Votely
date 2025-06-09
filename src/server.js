@@ -5,6 +5,14 @@ import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 
+// Routers
+
+import authRouter from "./authentications/auth.route.js";
+// import userRouter from "./routes/user.route.js";
+
+// imort { errorHandler } from "./middlewares/errorHandler.js";
+import { globalErrorHandler } from "./utils/error.handle.js";
+
 import { connectDb } from "./config/db.config.js";
 
 dotenv.config();
@@ -30,12 +38,18 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Routers
 
+// Authentication Router
+app.use("/api/auth", authRouter);
+
 app.get("/", (req, res) => {
   return res.status(200).json({
     status: true,
     message: "Welcome to the server",
   });
 });
+
+// global error middleware
+app.use(globalErrorHandler);
 
 // app.use((req, res) => {
 //   return res.status(404).json({
@@ -54,10 +68,10 @@ app.listen(PORT, () => {
 });
 
 // Handle unhandled promise rejections and shut down the server gracefully
-process.on("unhandledRejection", (err) => {
-  console.log("UNHANDLED REJECTION! 💥 Shutting down...");
-  console.log(err.name, err.message);
-  server.close(() => {
-    process.exit(1);
-  });
-});
+// process.on("unhandledRejection", (err) => {
+//   console.log("UNHANDLED REJECTION! 💥 Shutting down...");
+//   console.log(err.name, err.message);
+//   server.close(() => {
+//     process.exit(1);
+//   });
+// });

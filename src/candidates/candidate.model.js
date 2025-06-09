@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-const candidateSchema = new Schema(
+const candidateSchema = new mongoose.Schema(
   {
     fullName: { type: String, required: true }, // Display name
     description: { type: String }, // Optional campaign bio or summary
     electionId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Election",
       required: true,
     }, // Belongs to one election

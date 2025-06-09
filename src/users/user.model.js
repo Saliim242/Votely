@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    votedElections: [{ type: Schema.Types.ObjectId, ref: "Election" }],
+    votedElections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Election" }],
     profileImage: {
       type: String,
       default: null,
@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema(
       default: new Date(),
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
     },

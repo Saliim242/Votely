@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-const electionSchema = new Schema(
+const electionSchema = new mongoose.Schema(
   {
     title: { type: String, required: true }, // Election name or label
     description: { type: String }, // Optional: details about this election
@@ -13,8 +13,12 @@ const electionSchema = new Schema(
       enum: ["upcoming", "ongoing", "ended"],
       default: "upcoming",
     }, // Election state
-    createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Who created this election
-    candidates: [{ type: Schema.Types.ObjectId, ref: "Candidate" }], // All candidates competing in this election
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    }, // Who created this election
+    candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: "Candidate" }], // All candidates competing in this election
   },
   { timestamps: true }
 );
