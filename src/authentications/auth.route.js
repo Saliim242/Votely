@@ -7,6 +7,7 @@ import {
   forgotPassword,
   resetPassword,
   changePassword,
+  checkAuth,
   logout,
 } from "./auth.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
@@ -33,6 +34,9 @@ router.post("/reset-password", resetPassword);
 
 // Change password
 router.post("/change-password", protect, changePassword);
+
+// Check authentication status
+router.get("/check-auth", protect, checkAuth);
 
 // Logout user
 router.post("/logout", logout);
