@@ -1,0 +1,28 @@
+import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
+
+const voteSchema = new Schema(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Voter ID
+    electionId: {
+      type: Schema.Types.ObjectId,
+      ref: "Election",
+      required: true,
+    }, // Election context
+    candidateId: {
+      type: Schema.Types.ObjectId,
+      ref: "Candidate",
+      required: true,
+    }, // Voted candidate
+    votedAt: { type: Date, default: Date.now }, // When the vote was cast
+  },
+  { timestamps: true }
+);
+
+voteSchema.index({ userId: 1, electionId: 1 }, { unique: true }); // Prevent multiple votes
+
+voteSchema.plugin(mongoosePaginate);
+
+const Vote = mongoose.model("Vote", userSchema);
+
+export default Vote;
