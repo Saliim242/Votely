@@ -21,6 +21,6 @@ const candidateSchema = new Schema(
 
 candidateSchema.plugin(mongoosePaginate);
 
-const Candidate = mongoose.model("Candidate", userSchema);
+const Candidate = mongoose.model("Candidate", candidateSchema);
 
 export default Candidate;
