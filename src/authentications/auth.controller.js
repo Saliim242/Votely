@@ -437,6 +437,45 @@ export const changePassword = async (req, res, next) => {
 };
 
 /**
+ * @desc    Check User Authentication
+ * @route   POST /api/auth/check-auth
+ * @tod     Add check auth route
+ * @access  Private
+ */
+
+export const checkAuth = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "User authenticated successfully",
+      data: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        role: user.role,
+        isVerified: user.isVerified,
+        status: user.status,
+        lastLogin: user.lastLogin,
+        registeredDate: user.registeredDate,
+        token: req.token,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    logout user
  * @route   POST /api/auth/logout
  * @access  Private
