@@ -4,11 +4,16 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 // Routers
 
 import authRouter from "./authentications/auth.route.js";
 import userRouter from "./users/user.route.js";
+import candidateRouter from "./candidates/candidate.route.js";
+import electionRouter from "./elections/elections.route.js";
+import voteRouter from "./votes/vote.route.js";
 
 // imort { errorHandler } from "./middlewares/errorHandler.js";
 import { globalErrorHandler } from "./utils/error.handle.js";
@@ -19,6 +24,19 @@ dotenv.config();
 // Call Connection DB
 connectDb();
 const app = express();
+
+// Create HTTP server and Socket.IO instance
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.CLIENT_URL || "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  },
+});
+
+// Make io accessible to route handlers
+app.set("io", io);
 
 // Middlewars
 // cors middleware to allow cross origin requests to the server
@@ -40,13 +58,52 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Authentication Router
 app.use("/api/auth", authRouter);
+
 // User Router
 app.use("/api/users", userRouter);
+
+// Candidate Router
+app.use("/api/candidates", candidateRouter);
+
+// Election Router
+app.use("/api/elections", electionRouter);
+
+// Vote Router
+app.use("/api/votes", voteRouter);
 
 app.get("/", (req, res) => {
   return res.status(200).json({
     status: true,
     message: "Welcome to the server",
+  });
+});
+
+// Socket.IO event handlers
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  // Join election room for real-time updates
+  socket.on("join-election", (electionId) => {
+    socket.join(`election-${electionId}`);
+    console.log(
+      `User ${socket.id} joined election room: election-${electionId}`
+    );
+  });
+
+  // Admin users can join admin room for monitoring
+  socket.on("join-admin-room", () => {
+    socket.join("admin-room");
+    console.log(`Admin ${socket.id} joined admin room`);
+  });
+
+  // Leave election room
+  socket.on("leave-election", (electionId) => {
+    socket.leave(`election-${electionId}`);
+    console.log(`User ${socket.id} left election room: election-${electionId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 });
 
@@ -62,7 +119,8 @@ app.use(globalErrorHandler);
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
+// Use httpServer instead of app.listen
+httpServer.listen(PORT, () => {
   console.log(
     `Server is running on port ${PORT} in ${process.env.NODE_ENV} mode`.yellow
       .bold
@@ -73,7 +131,7 @@ app.listen(PORT, () => {
 // process.on("unhandledRejection", (err) => {
 //   console.log("UNHANDLED REJECTION! 💥 Shutting down...");
 //   console.log(err.name, err.message);
-//   server.close(() => {
+//   httpServer.close(() => {
 //     process.exit(1);
 //   });
 // });
