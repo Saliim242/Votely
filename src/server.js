@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 // Routers
 
 import authRouter from "./authentications/auth.route.js";
-// import userRouter from "./routes/user.route.js";
+import userRouter from "./users/user.route.js";
 
 // imort { errorHandler } from "./middlewares/errorHandler.js";
 import { globalErrorHandler } from "./utils/error.handle.js";
@@ -40,6 +40,8 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Authentication Router
 app.use("/api/auth", authRouter);
+// User Router
+app.use("/api/users", userRouter);
 
 app.get("/", (req, res) => {
   return res.status(200).json({

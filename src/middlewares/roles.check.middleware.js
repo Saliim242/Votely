@@ -4,8 +4,35 @@
  * @param {Array} roles - Array of roles allowed to access the route
  * @returns {Function} - Express middleware function
  */
+
+// middleware/roleChecker.js
+
+export const checkRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized: No user found" });
+    }
+
+    const userRole = req.user.role;
+
+    if (!allowedRoles.includes(userRole)) {
+      return res.status(403).json({
+        success: false,
+        message: `Forbidden: Access allowed only for [${allowedRoles.join(
+          ", "
+        )}]`,
+      });
+    }
+
+    next(); // ✅ User is allowed
+  };
+};
+
 export const restrictTo = (...roles) => {
   return (req, res, next) => {
+    console.log(req.user);
     if (!req.user) {
       return res.status(401).json({
         status: false,

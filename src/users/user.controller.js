@@ -78,23 +78,18 @@ export const updateUser = async (req, res, next) => {
     }
 
     // Update user
-    user.fullName = fullName || user.fullName;
-    user.email = email || user.email;
-    user.phoneNumber = phoneNumber || user.phoneNumber;
 
-    await user.save();
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    // res.status(200).json({ status: true, message: updatedUser });
+
+    // await user.save();
 
     res.status(200).json({
       status: true,
       message: "User updated successfully",
-      data: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        role: user.role,
-        isVerified: user.isVerified,
-      },
+      data: updatedUser,
     });
   } catch (error) {
     next(error);
@@ -119,6 +114,7 @@ export const deleteUser = async (req, res, next) => {
     res.status(200).json({
       status: true,
       message: "User deleted successfully",
+      data: {},
     });
   } catch (error) {
     next(error);
@@ -176,6 +172,47 @@ export const getMe = async (req, res, next) => {
       status: true,
       message: "User profile retrieved successfully",
       data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Update user User Role
+ * @route   PUT /api/users/:id/role
+ * @access  Private/Admin
+ */
+export const updateUserRole = async (req, res, next) => {
+  try {
+    const { role } = req.body;
+    // Find user
+    let user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    // lets check if the user is an admin
+    if (user.role === "Admin") {
+      return res
+        .status(403)
+        .json({ status: false, message: "You cannot update an admin role" });
+    }
+
+    // lets check  if the role is valid
+    if (!role || (role !== "Admin" && role !== "Voter")) {
+      return res.status(400).json({ status: false, message: "Invalid role" });
+    }
+    // Update user role
+    user.role = role;
+    await user.save();
+    res.status(200).json({
+      status: true,
+      message: "User role updated successfully",
+      data: {
+        id: user._id,
+        role: user.role,
+      },
     });
   } catch (error) {
     next(error);

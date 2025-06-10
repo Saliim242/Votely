@@ -5,15 +5,20 @@ import {
   updateUser,
   deleteUser,
   updateProfileImage,
+  updateUserRole,
   getMe,
 } from "./user.controller.js";
 import { protect, admin } from "../middlewares/auth.middleware.js";
-import { isOwnerOrAdmin } from "../middlewares/roles.check.middleware.js";
+import {
+  isOwnerOrAdmin,
+  restrictTo,
+  checkRole,
+} from "../middlewares/roles.check.middleware.js";
 
 const route = express.Router();
 
 // GET /api/users - Get all users
-route.get("/", protect, admin, getAllUsers);
+route.get("/", protect, checkRole("Admin"), getAllUsers);
 
 // GET /api/users/me - Get current logged in user
 route.get("/me", protect, getMe);
@@ -42,7 +47,16 @@ route.put(
   updateProfileImage
 );
 
+// PUT /api/users/:id/role - Update a user's role
+route.patch(
+  "/:id/role",
+  protect,
+  checkRole("Admin"),
+
+  updateUserRole
+);
+
 // DELETE /api/users/:id - Delete a user
-route.delete("/:id", protect, admin, deleteUser);
+route.delete("/:id", protect, checkRole("Admin"), deleteUser);
 
 export default route;
