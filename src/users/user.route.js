@@ -8,6 +8,7 @@ import {
   updateUserRole,
   getMe,
 } from "./user.controller.js";
+import upload from "../middlewares/upload.middleware.js";
 import { protect, admin } from "../middlewares/auth.middleware.js";
 import {
   isOwnerOrAdmin,
@@ -44,6 +45,7 @@ route.put(
   "/:id/profile-image",
   protect,
   isOwnerOrAdmin((req) => req.params.id),
+  upload.single("image"),
   updateProfileImage
 );
 
